@@ -8,5 +8,5 @@ https://github.com/falconry/falcon
 
 - clone repo and `cd sarjis`
 - create and activate virtual environment: `python3 -m venv venv; source venv/bin/activate`
-- install modules: `pip install requirements.txt`
+- install modules: `pip install -r requirements.txt`
 - start server: `gunicorn app:app`
