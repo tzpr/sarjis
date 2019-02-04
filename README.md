@@ -18,4 +18,4 @@ https://github.com/falconry/falcon
 
 - clone repo and `cd sarjis`
 - build docker image: `docker build . -t sarjis`
-- run image: ´docker run -p 8000:8000 sarjis´
+- execute image: `docker run -p 8000:8000 sarjis
