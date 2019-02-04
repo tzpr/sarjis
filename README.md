@@ -19,3 +19,4 @@ https://github.com/falconry/falcon
 - clone repo and `cd sarjis`
 - build docker image: `docker build . -t sarjis`
 - execute image: `docker run -p 8000:8000 sarjis`
+- test in terminal: `curl localhost:8000/quotes`
