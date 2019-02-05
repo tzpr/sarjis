@@ -2,6 +2,9 @@ import falcon
 import requests
 from bs4 import BeautifulSoup
 import os
+from PIL import Image
+from io import BytesIO
+import msgpack
 
 
 
@@ -27,14 +30,17 @@ class Fingerpori(object):
             soup = BeautifulSoup(res.text, 'html.parser')
             # 1. div class cartoon-content > 1. img > data-srcset
             dirty_comic_url = soup.select('.cartoon-content')[0].select('img')[0]['data-srcset']
-            comic_url = dirty_comic_url.split()[0][2:]
             schema = 'https://'
-            res = requests.get(schema + comic_url)
-            res.raise_for_status()
-            # TODO: Fix me, I am wrong.
+            comic_url = schema + dirty_comic_url.split()[0][2:]
+            print('Comic ULR:', comic_url)
+            res = requests.get(comic_url)
+            i = Image.open(BytesIO(res.content))
+            i.save('fingerpori.png')  # image is saved to a file
+            # TODO: return the image
+            print('TESTING the image:', i)
+            #resp.data = msgpack.packb(i, use_bin_type=True)  # TypeError: can not serialize 'JpegImageFile' object
+            #resp.content_type = falcon.MEDIA_MSGPACK
             resp.status = falcon.HTTP_200  # This is the default status
-            resp.stream = open(res.text, 'rb')
-            resp.stream_len = os.path.getsize(res.text)
         except:
             resp.status = falcon.HTTP_500
             resp.body('ERROR ERROR')
