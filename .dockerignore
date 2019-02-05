@@ -3,4 +3,5 @@
 .gitignore
 Dockerfile
 README.md
-
+venv
+.vscode/
