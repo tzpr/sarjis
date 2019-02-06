@@ -14,7 +14,7 @@ https://github.com/falconry/falcon
 - start server: `gunicorn app:app`
 - test in terminal: `curl localhost:8000/quotes`
 
-#### using docker 
+#### using docker (TODO: fix)
 
 - clone repo and `cd sarjis`
 - build docker image: `docker build . -t sarjis`
