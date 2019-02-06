@@ -19,8 +19,19 @@ class QuoteResource(object):
                      '    ~ Philip K. Dick\n\n')
 
 
-class Fingerpori(object):
+class ViiviWagner(object):
+    def on_get(self, req, resp): 
+        resp.status = falcon.HTTP_200
+        resp.body = '\nDaily Viivi and Wagner\n\n'
 
+
+class FokIt(object):
+    def on_get(self, req, resp): 
+        resp.status = falcon.HTTP_200
+        resp.body = '\nDaily Fok_It\n\n'        
+
+
+class Fingerpori(object):
     def on_get(self, req, resp): 
         DEBUG = False
         SCHEMA = 'https://'
@@ -64,7 +75,11 @@ app = falcon.API()
 # Resources are represented by long-lived class instances
 quotes = QuoteResource()
 fingerpori = Fingerpori()
+viiviw = ViiviWagner()
+fokit = FokIt()
 
-# things will handle all requests to the '/things' URL path
+# request handlers for paths
 app.add_route('/quotes', quotes)
 app.add_route('/finger', fingerpori)
+app.add_route('/viiviw', viiviw)
+app.add_route('/fokit', fokit)
