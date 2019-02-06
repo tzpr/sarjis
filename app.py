@@ -1,10 +1,8 @@
 import falcon
 import requests
 from bs4 import BeautifulSoup
-import os
 from PIL import Image
 from io import BytesIO
-import msgpack
 
 
 
@@ -22,25 +20,39 @@ class QuoteResource(object):
 
 
 class Fingerpori(object):
-    def on_get(self, req, resp):        
+
+    def on_get(self, req, resp): 
+        DEBUG = False
+        SCHEMA = 'https://'
+        URL_HS = SCHEMA + 'www.hs.fi'
+        URL_FINGERPORI = URL_HS + '/fingerpori/'
+
         try:
-            finger_page_url = 'https://www.hs.fi/fingerpori/'
-            res = requests.get(finger_page_url)
-            res.raise_for_status()
+            res = requests.get(URL_FINGERPORI)
             soup = BeautifulSoup(res.text, 'html.parser')
-            # 1. div class cartoon-content > 1. img > data-srcset
-            dirty_comic_url = soup.select('.cartoon-content')[0].select('img')[0]['data-srcset']
-            schema = 'https://'
-            comic_url = schema + dirty_comic_url.split()[0][2:]
-            print('Comic ULR:', comic_url)
+            image_link_url = URL_HS + soup.select('.cartoon-content')[0].select('a')[0]['href']
+            
+            if (DEBUG):
+                print('image_link_url: ', image_link_url)
+
+            res = requests.get(image_link_url)
+            soup = BeautifulSoup(res.text, 'html.parser')
+
+            dirty_comic_url = soup.select('.scroller')[0].select('img')[0]['data-srcset']
+            comic_url = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
+
+            if (DEBUG):
+                print('imgage url:', comic_url)
+
+            # TODO: check and maybe refactor
             res = requests.get(comic_url)
-            i = Image.open(BytesIO(res.content))
-            i.save('fingerpori.png')  # image is saved to a file
-            # TODO: return the image
-            print('TESTING the image:', i)
-            #resp.data = msgpack.packb(i, use_bin_type=True)  # TypeError: can not serialize 'JpegImageFile' object
-            #resp.content_type = falcon.MEDIA_MSGPACK
-            resp.status = falcon.HTTP_200  # This is the default status
+            image = Image.open(BytesIO(res.content))
+            imgByteArr = BytesIO()
+            image.save(imgByteArr, format='PNG')
+            imgByteArr = imgByteArr.getvalue()
+            resp.body = imgByteArr
+            resp.content_type = falcon.MEDIA_PNG
+            resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
             resp.body('ERROR ERROR')
@@ -56,4 +68,3 @@ fingerpori = Fingerpori()
 # things will handle all requests to the '/things' URL path
 app.add_route('/quotes', quotes)
 app.add_route('/finger', fingerpori)
-
