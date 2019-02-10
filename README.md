@@ -14,9 +14,11 @@ https://github.com/falconry/falcon
 - start server: `gunicorn app:app`
 - test in terminal: `curl localhost:8000/quotes`
 
-#### using docker (TODO: fix)
+#### using docker
+
+Obs. prerequisite: docker installed
 
 - clone repo and `cd sarjis`
 - build docker image: `docker build . -t sarjis`
-- execute image: `docker run -p 8000:8000 sarjis`
-- test in terminal: `curl localhost:8000/quotes`
+- execute image AKA instantiate container: `docker run -p 999:8000 sarjis`
+- test in terminal: `curl localhost:999/quotes`
