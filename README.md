@@ -14,7 +14,7 @@ Currently supports Viivi ja Wager, Fok_It and Fingerpori from [Helsingin Sanomat
 - start server: `gunicorn app:app`
 - test in terminal: `curl localhost:8000/quotes`
 
-#### using docker
+#### with docker
 
 prerequisite: docker installed
 
