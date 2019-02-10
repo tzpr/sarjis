@@ -16,7 +16,7 @@ https://github.com/falconry/falcon
 
 #### using docker
 
-Obs. prerequisite: docker installed
+prerequisite: docker installed
 
 - clone repo and `cd sarjis`
 - build docker image: `docker build . -t sarjis`
