@@ -1,48 +1,43 @@
 import falcon
-import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
+from urllib.request import urlretrieve
+from urllib.request import urlopen
+from pathlib import Path
+import datetime
 
 
-
-def scrape_daily_comic_strip(comimc_path):
-    DEBUG = False
+def scrape_daily_comic_strip(comimc_path, img_name):
     SCHEMA = 'https://'
     URL_HS = SCHEMA + 'www.hs.fi' 
     URL_COMIC = URL_HS + comimc_path
 
-    res = requests.get(URL_COMIC)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    image_link_url = URL_HS + soup.select('.cartoon-content')[0].select('a')[0]['href']
-    
-    if (DEBUG):
-        print('image_link_url: ', image_link_url)
+    image_file_name = str(datetime.date.today()) + '_' + img_name + '.png'
 
-    res = requests.get(image_link_url)
-    soup = BeautifulSoup(res.text, 'html.parser')
+    # check if img exists
+    if not Path(image_file_name).is_file():
+        html = urlopen(URL_COMIC)
+        bsObj = BeautifulSoup(html, 'html.parser')
+        image_link_url = URL_HS + bsObj.select('.cartoon-content')[0].select('a')[0]['href']
 
-    dirty_comic_url = soup.select('.scroller')[0].select('img')[0]['data-srcset']
-    comic_url = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
+        html = urlopen(image_link_url)
+        bsObj = BeautifulSoup(html, 'html.parser')
+        dirty_comic_url = bsObj.select('.scroller')[0].select('img')[0]['data-srcset']
+        image_location = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
 
-    if (DEBUG):
-        print('imgage url:', comic_url)
+        urlretrieve(image_location, image_file_name)
 
-    # TODO: check and maybe refactor
-    res = requests.get(comic_url)
-    image = Image.open(BytesIO(res.content))
+    # TODO check if there's a better way
+    image = Image.open(image_file_name)
     imgByteArr = BytesIO()
     image.save(imgByteArr, format='PNG')
-    imgByteArr = imgByteArr.getvalue()
-    return imgByteArr
+    return imgByteArr.getvalue()
 
 
-
-# Falcon follows the REST architectural style, meaning (among
-# other things) that you think in terms of resources and state
-# transitions, which map to HTTP verbs.
 class QuoteResource(object):
     def on_get(self, req, resp):
+        print('Testing magik:', req.params.get('magik'))
         """Handles GET requests"""
         resp.status = falcon.HTTP_200  # This is the default status
         resp.body = ('\nIt is sometimes an appropriate response '
@@ -52,11 +47,13 @@ class QuoteResource(object):
 
 
 class ViiviWagner(object):
-    def on_get(self, req, resp): 
+    def on_get(self, req, resp):
         COMIC_PATH = '/viivijawagner/'
+      
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH)
+            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'viivi-wagner')
             resp.content_type = falcon.MEDIA_PNG
+           # resp.send_header("Content-length", img_size)
             resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
@@ -64,10 +61,10 @@ class ViiviWagner(object):
 
 
 class FokIt(object):
-    def on_get(self, req, resp): 
+    def on_get(self, req, resp):
         COMIC_PATH = '/nyt/fokit/'
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH)
+            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'fokit')
             resp.content_type = falcon.MEDIA_PNG
             resp.status = falcon.HTTP_200
         except:
@@ -79,7 +76,7 @@ class Fingerpori(object):
     def on_get(self, req, resp): 
         COMIC_PATH = '/fingerpori/'
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH)
+            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'fingerpori')
             resp.content_type = falcon.MEDIA_PNG
             resp.status = falcon.HTTP_200
         except:
@@ -91,13 +88,13 @@ class Fingerpori(object):
 app = falcon.API()
 
 # Resources are represented by long-lived class instances
-quotes = QuoteResource()
+quote = QuoteResource()
 fingerpori = Fingerpori()
-viiviw = ViiviWagner()
+viivijawagner = ViiviWagner()
 fokit = FokIt()
 
 # request handlers for paths
-app.add_route('/quotes', quotes)
+app.add_route('/quote', quote)
 app.add_route('/finger', fingerpori)
-app.add_route('/viivijawagner', viiviw)
+app.add_route('/viivi', viivijawagner)
 app.add_route('/fokit', fokit)
