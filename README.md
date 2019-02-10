@@ -3,6 +3,8 @@ Extract daily comics from different sources
 
 Currently supports Viivi ja Wager, Fok_It and Fingerpori from [Helsingin Sanomat](https://hs.fi)
 
+Feel free to add more amazing comics!
+
 
 ### installing and running 
 
