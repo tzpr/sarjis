@@ -1,7 +1,7 @@
 # sarjis
 Extract daily comics from different sources
 
-https://github.com/falconry/falcon
+Currently supports Viivi ja Wager, Fok_It and Fingerpori from [Helsingin Sanomat](https://hs.fi)
 
 
 ### installing and running 
