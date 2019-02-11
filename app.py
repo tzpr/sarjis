@@ -8,28 +8,33 @@ from pathlib import Path
 import datetime
 
 
-def scrape_daily_comic_strip(comimc_path, img_name):
+def in_cache(image_file_name):
+    return Path(image_file_name).is_file()
+
+
+def update_cache(image_location, image_name):
+    urlretrieve(image_location, image_name)
+
+
+def daily_comic_from_hs(comimc_path, comic_name):
     SCHEMA = 'https://'
     URL_HS = SCHEMA + 'www.hs.fi' 
     URL_COMIC = URL_HS + comimc_path
 
-    image_file_name = str(datetime.date.today()) + '_' + img_name + '.png'
+    image_name = str(datetime.date.today()) + '_' + comic_name + '.png'
 
-    # check if img exists
-    if not Path(image_file_name).is_file():
+    if not in_cache(image_name):
         html = urlopen(URL_COMIC)
         bsObj = BeautifulSoup(html, 'html.parser')
         image_link_url = URL_HS + bsObj.select('.cartoon-content')[0].select('a')[0]['href']
-
         html = urlopen(image_link_url)
         bsObj = BeautifulSoup(html, 'html.parser')
         dirty_comic_url = bsObj.select('.scroller')[0].select('img')[0]['data-srcset']
         image_location = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
-
-        urlretrieve(image_location, image_file_name)
+        update_cache(image_location, image_name)
 
     # TODO check if there's a better way
-    image = Image.open(image_file_name)
+    image = Image.open(image_name)
     imgByteArr = BytesIO()
     image.save(imgByteArr, format='PNG')
     return imgByteArr.getvalue()
@@ -51,9 +56,8 @@ class ViiviWagner(object):
         COMIC_PATH = '/viivijawagner/'
       
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'viivi-wagner')
+            resp.body = daily_comic_from_hs(COMIC_PATH, 'viivi-wagner')
             resp.content_type = falcon.MEDIA_PNG
-           # resp.send_header("Content-length", img_size)
             resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
@@ -64,7 +68,7 @@ class FokIt(object):
     def on_get(self, req, resp):
         COMIC_PATH = '/nyt/fokit/'
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'fokit')
+            resp.body = daily_comic_from_hs(COMIC_PATH, 'fokit')
             resp.content_type = falcon.MEDIA_PNG
             resp.status = falcon.HTTP_200
         except:
@@ -76,7 +80,7 @@ class Fingerpori(object):
     def on_get(self, req, resp): 
         COMIC_PATH = '/fingerpori/'
         try:
-            resp.body = scrape_daily_comic_strip(COMIC_PATH, 'fingerpori')
+            resp.body = daily_comic_from_hs(COMIC_PATH, 'fingerpori')
             resp.content_type = falcon.MEDIA_PNG
             resp.status = falcon.HTTP_200
         except:
