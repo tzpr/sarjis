@@ -16,11 +16,18 @@ def update_cache(image_location, image_name):
     urlretrieve(image_location, image_name)
 
 
+def image_from_cache(image_name):
+    # TODO is there a better way?
+    image = Image.open(image_name)
+    imgByteArr = BytesIO()
+    image.save(imgByteArr, format='PNG')
+    return imgByteArr.getvalue()
+
+
 def daily_comic_from_hs(comimc_path, comic_name):
     SCHEMA = 'https://'
     URL_HS = SCHEMA + 'www.hs.fi' 
     URL_COMIC = URL_HS + comimc_path
-
     image_name = str(datetime.date.today()) + '_' + comic_name + '.png'
 
     if not in_cache(image_name):
@@ -33,11 +40,7 @@ def daily_comic_from_hs(comimc_path, comic_name):
         image_location = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
         update_cache(image_location, image_name)
 
-    # TODO check if there's a better way
-    image = Image.open(image_name)
-    imgByteArr = BytesIO()
-    image.save(imgByteArr, format='PNG')
-    return imgByteArr.getvalue()
+    return image_from_cache(image_name)
 
 
 class QuoteResource(object):
@@ -54,7 +57,6 @@ class QuoteResource(object):
 class ViiviWagner(object):
     def on_get(self, req, resp):
         COMIC_PATH = '/viivijawagner/'
-      
         try:
             resp.body = daily_comic_from_hs(COMIC_PATH, 'viivi-wagner')
             resp.content_type = falcon.MEDIA_PNG
