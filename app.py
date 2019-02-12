@@ -26,17 +26,19 @@ def image_from_cache(image_name):
 
 def daily_comic_from_hs(comimc_path, comic_name):
     SCHEMA = 'https://'
-    URL_HS = SCHEMA + 'www.hs.fi' 
+    URL_HS = SCHEMA + 'www.hs.fi'
     URL_COMIC = URL_HS + comimc_path
     image_name = str(datetime.date.today()) + '_' + comic_name + '.png'
 
     if not in_cache(image_name):
         html = urlopen(URL_COMIC)
         bsObj = BeautifulSoup(html, 'html.parser')
-        image_link_url = URL_HS + bsObj.select('.cartoon-content')[0].select('a')[0]['href']
+        image_link_url = URL_HS + \
+            bsObj.select('.cartoon-content')[0].select('a')[0]['href']
         html = urlopen(image_link_url)
         bsObj = BeautifulSoup(html, 'html.parser')
-        dirty_comic_url = bsObj.select('.scroller')[0].select('img')[0]['data-srcset']
+        dirty_comic_url = bsObj.select('.scroller')[0].select('img')[
+            0]['data-srcset']
         image_location = SCHEMA + dirty_comic_url.split()[0][2:] + '.webp'
         update_cache(image_location, image_name)
 
@@ -63,7 +65,7 @@ class ViiviWagner(object):
             resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
-            resp.body('ERROR ERROR')   
+            resp.body('ERROR ERROR')
 
 
 class FokIt(object):
@@ -75,11 +77,11 @@ class FokIt(object):
             resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
-            resp.body('ERROR ERROR')                
+            resp.body('ERROR ERROR')
 
 
 class Fingerpori(object):
-    def on_get(self, req, resp): 
+    def on_get(self, req, resp):
         COMIC_PATH = '/fingerpori/'
         try:
             resp.body = daily_comic_from_hs(COMIC_PATH, 'fingerpori')
@@ -87,7 +89,7 @@ class Fingerpori(object):
             resp.status = falcon.HTTP_200
         except:
             resp.status = falcon.HTTP_500
-            resp.body('ERROR ERROR')  
+            resp.body('ERROR ERROR')
 
 
 # falcon.API instances are callable WSGI apps
