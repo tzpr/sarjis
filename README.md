@@ -1,7 +1,7 @@
 # sarjis
 Extract daily comics from different sources
 
-Currently supports Viivi ja Wager, Fok_It and Fingerpori from Helsingin Sanomat.
+Currently supports Viivi ja Wager, Fok_It and Fingerpori from Helsingin Sanomat and Dilbert from dilbert.com.
 
 
 
