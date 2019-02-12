@@ -45,6 +45,30 @@ def daily_comic_from_hs(comimc_path, comic_name):
     return image_from_cache(image_name)
 
 
+class Dilbert(object):
+    def on_get(self, req, resp):
+        SCHEMA = 'https://'
+        URL_DILBERT = SCHEMA + 'dilbert.com'
+        URL_COMIC = URL_DILBERT + '/strip/' + str(datetime.date.today())
+        image_name = str(datetime.date.today()) + '_dilbert.png'
+
+        if not in_cache(image_name):
+            html = urlopen(URL_COMIC)
+            bsObj = BeautifulSoup(html, 'html.parser')
+            dirty_comic_url = bsObj.select(
+                '.img-comic-container')[0].select('img')[0]['src']
+            image_location = SCHEMA + dirty_comic_url[2:]
+            update_cache(image_location, image_name)
+
+        try:
+            resp.body = image_from_cache(image_name)
+            resp.content_type = falcon.MEDIA_PNG
+            resp.status = falcon.HTTP_200
+        except:
+            resp.status = falcon.HTTP_500
+            resp.body('ERROR ERROR')
+
+
 class QuoteResource(object):
     def on_get(self, req, resp):
         print('Testing magik:', req.params.get('magik'))
@@ -100,9 +124,11 @@ quote = QuoteResource()
 fingerpori = Fingerpori()
 viivijawagner = ViiviWagner()
 fokit = FokIt()
+dilbert = Dilbert()
 
 # request handlers for paths
 app.add_route('/quote', quote)
 app.add_route('/finger', fingerpori)
 app.add_route('/viivi', viivijawagner)
 app.add_route('/fokit', fokit)
+app.add_route('/dilbert', dilbert)
