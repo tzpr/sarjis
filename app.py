@@ -17,7 +17,7 @@ def update_cache(image_location, image_name):
 
 
 def image_from_cache(image_name):
-    # TODO is there a better way?
+    # Is there a better way?
     image = Image.open(image_name)
     imgByteArr = BytesIO()
     image.save(imgByteArr, format='PNG')
