@@ -7,7 +7,7 @@ falcon==1.4.1
 gunicorn==19.9.0
 idna==2.8
 msgpack==0.6.1
-Pillow==5.4.1
+pillow>=6.2.0
 pycodestyle==2.5.0
 python-mimeparse==1.6.0
 six==1.12.0
