@@ -1,8 +1,7 @@
 # sarjis
-Extract daily comics from different sources
+Extract daily comics from HS (https://www.hs.fi/)
 
-Currently supports Viivi ja Wager, Fok_It and Fingerpori from Helsingin Sanomat and Dilbert from dilbert.com.
-
+Currently supports Viivi ja Wager, Fok_It and Fingerpori from Helsingin Sanomat.
 
 
 
