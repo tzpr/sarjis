@@ -6,6 +6,7 @@ from urllib.request import urlretrieve
 from urllib.request import urlopen
 from pathlib import Path
 import datetime
+import json
 
 
 def in_cache(image_file_name):
@@ -24,11 +25,11 @@ def image_from_cache(image_name):
     return imgByteArr.getvalue()
 
 
-def daily_comic_from_hs(comimc_path, comic_name):
+def daily_comic_from_hs(comic_path, comic_name):
     SCHEMA = 'https://'
-    URL_HS = SCHEMA + 'www.hs.fi'
-    URL_COMIC = URL_HS + comimc_path
-    image_name = str(datetime.date.today()) + '_' + comic_name + '.png'
+    URL_HS = f'{SCHEMA}www.hs.fi'
+    URL_COMIC = f'{URL_HS}{comic_path}'
+    image_name = f'{datetime.date.today()}_{comic_name}.png'
 
     if not in_cache(image_name):
         html = urlopen(URL_COMIC)
@@ -47,13 +48,11 @@ def daily_comic_from_hs(comimc_path, comic_name):
 
 class QuoteResource(object):
     def on_get(self, req, resp):
-        print('Testing magik:', req.params.get('magik'))
         """Handles GET requests"""
         resp.status = falcon.HTTP_200  # This is the default status
-        resp.body = ('\nIt is sometimes an appropriate response '
-                     'to reality to go insane.\n'
-                     '\n'
-                     '    ~ Philip K. Dick\n\n')
+        resp.body = json.dumps('It is sometimes an appropriate response '
+                     'to reality to go insane.'
+                     '    ~ Philip K. Dick')
 
 
 class ViiviWagner(object):
